@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -17,6 +18,14 @@ public class UserService {
 
     public Collection<User> findAll() {
         return users.values();
+    }
+
+    public Optional<User> findById(long userId) {
+        if (users.containsKey(userId)) {
+            return Optional.of(users.get(userId));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public User create(User newUser) {

@@ -14,4 +14,8 @@ public class Post {
     private long authorId;
     private String description;
     private Instant postDate;
+
+    public Instant getPostDate() {
+        return postDate;
+    }
 }

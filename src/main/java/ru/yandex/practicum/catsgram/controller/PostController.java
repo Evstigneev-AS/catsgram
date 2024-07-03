@@ -1,12 +1,6 @@
 package ru.yandex.practicum.catsgram.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
@@ -24,8 +18,18 @@ public class PostController {
     }
 
     @GetMapping
-    public Collection<Post> findAll() {
-        return postService.findAll();
+    public Collection<Post> findAll(
+            @RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
+            @RequestParam(value = "size", defaultValue = "10", required = false) Integer size,
+            @RequestParam(value = "sort", defaultValue = "desc", required = false) String sort) {
+        Integer from = page * size;
+        if (!(sort.equals("asc") || sort.equals("desc"))) {
+            throw new IllegalArgumentException();
+        }
+        if (page < 0 || size <= 0) {
+            throw new IllegalArgumentException();
+        }
+        return postService.findAll(size, from, sort);
     }
 
     @GetMapping("/{postId}")
