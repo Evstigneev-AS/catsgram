@@ -2,11 +2,11 @@ package ru.yandex.practicum.catsgram.model;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+//import lombok.EqualsAndHashCode;
 
 @Data
 @Builder(toBuilder = true)
-@EqualsAndHashCode(of = "id")
+//@EqualsAndHashCode(of = "id")
 public class Image {
     private Long id;
     private long postId;

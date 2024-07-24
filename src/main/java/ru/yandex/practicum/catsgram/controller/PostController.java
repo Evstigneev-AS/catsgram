@@ -2,6 +2,7 @@ package ru.yandex.practicum.catsgram.controller;
 
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
+import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
 
@@ -10,7 +11,6 @@ import java.util.Collection;
 @RestController
 @RequestMapping("/posts")
 public class PostController {
-
     private final PostService postService;
 
     public PostController(PostService postService) {
@@ -24,13 +24,18 @@ public class PostController {
             @RequestParam(value = "sort", defaultValue = "desc", required = false) String sort) {
         Integer from = page * size;
         if (!(sort.equals("asc") || sort.equals("desc"))) {
-            throw new IllegalArgumentException();
+            throw new ParameterNotValidException("sort", "Получено: " + sort + ". Значение должно быть: asc или desc");
         }
-        if (page < 0 || size <= 0) {
-            throw new IllegalArgumentException();
+        if (size <= 0) {
+            throw new ParameterNotValidException("size", "Размер должен быть больше нуля");
         }
+        if (from < 0) {
+            throw new ParameterNotValidException("from", "Начало выборки должно быть положительным числом");
+        }
+
         return postService.findAll(size, from, sort);
     }
+
 
     @GetMapping("/{postId}")
     public Post findPost(@PathVariable("postId") Integer postId) {
