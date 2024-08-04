@@ -9,34 +9,37 @@ import ru.yandex.practicum.catsgram.model.ErrorResponse;
 
 @RestControllerAdvice
 public class ErrorHandler {
-
-    @ExceptionHandler(NotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(NotFoundException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler(DuplicatedDataException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicatedDataException(DuplicatedDataException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler(ConditionsNotMetException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ErrorResponse handleConditionsNotMetException(ConditionsNotMetException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler(ParameterNotValidException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleParameterNotValidException(ParameterNotValidException e) {
-        return new ErrorResponse("Некорректное значение параметра " + e.getParameter() + ": " + e.getReason());
+    public ErrorResponse handleIncorrectParameterException(final ParameterNotValidException e) {
+        return new ErrorResponse(
+                String.format("Некорректное значение параметра %s: %s", e.getParameter(), e.getReason())
+        );
     }
 
-    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErrorResponse handleConditionsNotMetException(final ConditionsNotMetException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleNotFoundException(final NotFoundException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleDuplicatedDataException(final DuplicatedDataException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleThrowable(Throwable e) {
-        return new ErrorResponse("Произошла непредвиденная ошибка.");
+    public ErrorResponse handleThrowable(final Throwable ignored) {
+        return new ErrorResponse(
+                "Произошла непредвиденная ошибка."
+        );
     }
 }

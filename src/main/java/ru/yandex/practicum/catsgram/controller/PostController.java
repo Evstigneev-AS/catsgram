@@ -1,54 +1,41 @@
 package ru.yandex.practicum.catsgram.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
-import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
-import ru.yandex.practicum.catsgram.model.Post;
+import ru.yandex.practicum.catsgram.dto.NewPostRequest;
+import ru.yandex.practicum.catsgram.dto.PostDto;
+import ru.yandex.practicum.catsgram.dto.UpdatePostRequest;
 import ru.yandex.practicum.catsgram.service.PostService;
 
-import java.util.Collection;
+import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/posts")
 public class PostController {
     private final PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public PostDto createPost(@RequestBody NewPostRequest post) {
+        return postService.createPost(post);
+    }
+
+    @GetMapping("/{postId}")
+    @ResponseStatus(HttpStatus.OK)
+    public PostDto getPostById(@PathVariable("postId") long postId) {
+        return postService.getPostById(postId);
     }
 
     @GetMapping
-    public Collection<Post> findAll(
-            @RequestParam(value = "page", defaultValue = "0", required = false) Integer page,
-            @RequestParam(value = "size", defaultValue = "10", required = false) Integer size,
-            @RequestParam(value = "sort", defaultValue = "desc", required = false) String sort) {
-        Integer from = page * size;
-        if (!(sort.equals("asc") || sort.equals("desc"))) {
-            throw new ParameterNotValidException("sort", "Получено: " + sort + ". Значение должно быть: asc или desc");
-        }
-        if (size <= 0) {
-            throw new ParameterNotValidException("size", "Размер должен быть больше нуля");
-        }
-        if (from < 0) {
-            throw new ParameterNotValidException("from", "Начало выборки должно быть положительным числом");
-        }
-
-        return postService.findAll(size, from, sort);
+    @ResponseStatus(HttpStatus.OK)
+    public List<PostDto> getPosts() {
+        return postService.getPosts();
     }
 
-
-    @GetMapping("/{postId}")
-    public Post findPost(@PathVariable("postId") Integer postId) {
-        return postService.findById(postId).orElseThrow(() -> new ConditionsNotMetException("Указанный пост не найден"));
-    }
-
-    @PostMapping
-    public Post create(@RequestBody Post post) {
-        return postService.create(post);
-    }
-
-    @PutMapping
-    public Post update(@RequestBody Post newPost) {
-        return postService.update(newPost);
+    @PutMapping("/{postId}")
+    public PostDto updatePost(@PathVariable("postId") long postId, @RequestBody UpdatePostRequest post) {
+        return postService.updatePost(postId, post);
     }
 }
